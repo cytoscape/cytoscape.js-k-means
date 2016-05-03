@@ -25,15 +25,15 @@ Download the library:
 CommonJS:
 ```js
 var cytoscape = require('cytoscape');
-var k-means = require('cytoscape-k-means');
+var kMeans = require('cytoscape-k-means');
 
-k-means( cytoscape ); // register extension
+kMeans( cytoscape ); // register extension
 ```
 
 AMD:
 ```js
-require(['cytoscape', 'cytoscape-k-means'], function( cytoscape, k-means ){
-  k-means( cytoscape ); // register extension
+require(['cytoscape', 'cytoscape-k-means'], function( cytoscape, kMeans ){
+  kMeans( cytoscape ); // register extension
 });
 ```
 
@@ -45,17 +45,7 @@ Plain HTML/JS has the extension registered for you automatically, because no `re
 Please briefly describe your API here:
 
 ```js
-cy.k-means({
-  foo: 'bar', // some option that does this
-  baz: 'bat' // some options that does that
-  // ... and so on
-});
-```
-
-Or maybe if you have a collection extension:
-
-```js
-cy.elements().test({
+cy.elements().kMeans({
   foo: 'bar', // some option that does this
   baz: 'bat' // some options that does that
   // ... and so on
