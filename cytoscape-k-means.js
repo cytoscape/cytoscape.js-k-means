@@ -1,5 +1,7 @@
 ;(function(){ 'use strict';
 
+  // Implemented from reference library: https://harthur.github.io/clusterfck/
+
   var distances = {
     euclidean: function (v1, v2) {
       var total = 0;
