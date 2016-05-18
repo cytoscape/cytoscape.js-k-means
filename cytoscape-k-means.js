@@ -69,7 +69,6 @@
 
       // Step 1: Initialize centroid positions
       var centroids = randomCentroids(nodes, k);
-      debugger;
       var assignment = {};//new Array(nodes.length);
       var clusters = new Array(k);
 
@@ -102,7 +101,7 @@
           }
 
           var centroid = centroids[c];
-          var newCentroid = centroid;// = new Array(centroid.length);
+          var newCentroid = centroid.clone();
 
           // Recalculate centroid position by taking avg position of nodes within cluster
           // and set flag if algorithm has converged/when centroids no longer change.
