@@ -7,10 +7,10 @@
 
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
 
-    <script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>
+    <!--<script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>-->
 
     <!-- for testing with local version of cytoscape.js -->
-    <!--<script src="../cytoscape.js/build/cytoscape.js"></script>-->
+    <script src="../cytoscape.js/build/cytoscape.js"></script>
 
     <script src="cytoscape-k-means.js"></script>
 
@@ -70,7 +70,11 @@
             });
 
             // demo your collection ext
-            cy.elements().kMeans( 2, "euclidean", 8 );
+            cy.elements().kMeans({
+                k: 2,
+                distance: "euclidean",
+                maxIterations: 8
+            });
 
         });
     </script>
