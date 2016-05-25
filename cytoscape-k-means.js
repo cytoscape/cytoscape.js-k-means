@@ -2,22 +2,45 @@
 
   // Implemented from the reference library: https://harthur.github.io/clusterfck/
 
+  var defaults = {
+    k: 2,
+    distance: 'euclidean',
+    maxIterations: 10,
+    attributes: [
+      function(node) {
+        return node.position('x')
+      },
+      function(node) {
+        return node.position('y')
+      }
+    ]
+  };
+
+  var setOptions = function( opts, options ) {
+    for (var i in options) { opts[i] = defaults[i]; }
+    for (var i in options) { opts[i] = options[i]; }
+  };
+
   var distances = {
-    euclidean: function (v1, v2) {
+    euclidean: function (v1, v2, attributes) {
       var total = 0;
-      total += Math.pow(v2.position('x') - v1.position('x'), 2);
-      total += Math.pow(v2.position('y') - v1.position('y'), 2);
+      for (var f in attributes) {
+        total += Math.pow(f(v2) - f(v1), 2);
+      }
       return Math.sqrt(total);
     },
-    manhattan: function (v1, v2) {
+    manhattan: function (v1, v2, attributes) {
       var total = 0;
-      total += Math.abs(v2.position('x') - v1.position('x'));
-      total += Math.abs(v2.position('y') - v1.position('y'));
+      for (var f in attributes) {
+        total += Math.abs(f(v2) - f(v1));
+      }
       return total;
     },
-    max: function (v1, v2) {
+    max: function (v1, v2, attributes) {
       var max = 0;
-      max = Math.max(max, Math.abs(v2.position('x') - v1.position('x')), Math.abs(v2.position('y') - v1.position('y')));
+      for (var f in attributes) {
+        max = Math.max(max, Math.abs(f(v2) - f(v1)));
+      }
       return max;
     }
   };
@@ -29,7 +52,7 @@
     return centroids.slice(0, k);
   };
 
-  var classify = function(point, centroids, distance) {
+  var classify = function(point, centroids, distance, attributes) {
     var min = Infinity,
         index = 0;
 
@@ -39,7 +62,7 @@
     }
 
     for (var i = 0; i < centroids.length; i++) {
-      var dist = distance(point, centroids[i]);
+      var dist = distance(point, centroids[i], attributes);
       if (dist < min) {
         min = dist;
         index = i;
@@ -53,17 +76,6 @@
   var register = function( cytoscape ){
 
     if( !cytoscape ){ return; } // can't register if cytoscape unspecified
-
-    var defaults = {
-      k: 2,
-      distance: 'euclidean',
-      maxIterations: 10
-    };
-
-    var setOptions = function( opts, options ) {
-      for (var i in options) { opts[i] = defaults[i]; }
-      for (var i in options) { opts[i] = options[i]; }
-    };
     
     cytoscape( 'collection', 'kMeans', function( options ){
       var eles = this;
@@ -90,7 +102,7 @@
         for ( var n = 0; n < nodes.length; n++ ) {
           node = nodes[n];
           // determine which cluster this node belongs to
-          assignment[ node.id() ] = classify(node, centroids, opts.distance); // node id => centroid #
+          assignment[ node.id() ] = classify(node, centroids, opts.distance, opts.attributes); // node id => centroid #
         }
 
         // Step 3: For each of the k clusters, recalculate its centroid position.
