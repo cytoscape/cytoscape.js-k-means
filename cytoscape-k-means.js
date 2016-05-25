@@ -1,6 +1,6 @@
 ;(function(){ 'use strict';
 
-  // Implemented from reference library: https://harthur.github.io/clusterfck/
+  // Implemented from the reference library: https://harthur.github.io/clusterfck/
 
   var distances = {
     euclidean: function (v1, v2) {
@@ -54,40 +54,48 @@
 
     if( !cytoscape ){ return; } // can't register if cytoscape unspecified
 
-    cytoscape( 'collection', 'kMeans', function( k, distance, maxIterations ){
+    var defaults = {
+      k: 2,
+      distance: 'euclidean',
+      maxIterations: 10
+    };
+
+    var setOptions = function( opts, options ) {
+      for (var i in options) { opts[i] = defaults[i]; }
+      for (var i in options) { opts[i] = options[i]; }
+    };
+    
+    cytoscape( 'collection', 'kMeans', function( options ){
       var eles = this;
       var cy = this.cy();
       var nodes = this.nodes();                         // => nodes[0].position() => { x: 0, y: 0 }
       var node = null;
+      var opts = {};
 
-      // Validate parameters passed in
-      k = k || Math.max(2, Math.ceil(Math.sqrt(nodes.length / 2)));
-      distance = distance || "euclidean";
-      if (typeof distance === "string") {
-        distance = distances[distance];
-      }
+      // Set parameters of algorithm: # of clusters, distance metric, etc.
+      setOptions( opts, options );
 
       // Begin k-means algorithm
 
       // Step 1: Initialize centroid positions
-      var centroids = randomCentroids(nodes, k);
-      var assignment = {};//new Array(nodes.length);
-      var clusters = new Array(k);
+      var centroids = randomCentroids(nodes, opts.k);
+      var assignment = {};
+      var clusters = new Array(opts.k);
 
       var iterations = 0;
       var movement = true;
-      while ( movement && iterations < maxIterations ) {
+      while ( movement && iterations < opts.maxIterations ) {
 
         // Step 2: Assign nodes to the nearest centroid.
         for ( var n = 0; n < nodes.length; n++ ) {
           node = nodes[n];
           // determine which cluster this node belongs to
-          assignment[ node.id() ] = classify(node, centroids, distance); // node id => centroid #
+          assignment[ node.id() ] = classify(node, centroids, opts.distance); // node id => centroid #
         }
 
         // Step 3: For each of the k clusters, recalculate its centroid position.
         movement = false;
-        for ( var c = 0; c < k; c++ ) { // for each cluster
+        for ( var c = 0; c < opts.k; c++ ) { // for each cluster
           var cluster = [];
 
           for ( n = 0; n < nodes.length; n++ ) {
