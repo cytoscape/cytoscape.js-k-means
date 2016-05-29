@@ -66,7 +66,10 @@
       centroids[c] = centroid;
     }
 
-    return centroids;
+    //return centroids;
+
+    // TODO: remove in final version
+    return [ [1.0,1.0], [5.0,7.0] ];
   };
 
   var classify = function(node, centroids, distance, attributes) {
@@ -84,6 +87,12 @@
     }
 
     return index;
+  };
+
+  var hasConverged = function(v1, v2) {
+    v1 = Math.round(v1 * 10000) / 10000;
+    v2 = Math.round(v2 * 10000) / 10000;
+    return v1 === v2;
   };
 
   // registers the extension on a cytoscape lib ref
@@ -111,6 +120,7 @@
       var iterations = 0;
       var movement = true;
       while ( movement && iterations < opts.maxIterations ) {
+        movement = false;
 
         // Step 2: Assign nodes to the nearest centroid.
         for ( var n = 0; n < nodes.length; n++ ) {
@@ -119,43 +129,49 @@
           assignment[ node.id() ] = classify(node, centroids, opts.distance, opts.attributes); // node id => centroid #
         }
 
-        // Step 3: For each of the k clusters, recalculate its centroid position.
+        // Step 3: For each of the k clusters, recalculate its centroid.
         movement = false;
         for ( var c = 0; c < opts.k; c++ ) { // for each cluster
-          var cluster = [];
+          var cluster = cy.collection();
 
+          // find all nodes that belong to this cluster
           for ( n = 0; n < nodes.length; n++ ) {
             node = nodes[n];
-            // if node belongs to this cluster #
-            if (assignment[ node.id() ] == c) {
-              cluster.push( node );
+            if (assignment[ node.id() ] === c) {
+              console.log("Node " + node.id() + " belongs in cluster " + c);
+              cluster = cluster.union( node );
             }
           }
 
-          if (!cluster.length) { // if cluster is empty, break out early & move to next cluster
+          if (cluster.empty()) { // if cluster is empty, break out early & move to next cluster
             continue;
           }
 
-          var centroid = centroids[c];
-          var newCentroid = centroid.clone();
-
-          // Recalculate centroid position by taking avg position of nodes within cluster
+          // Recalculate centroid position by taking avg attribute of nodes within cluster
           // and set flag if algorithm has converged/when centroids no longer change.
-          var sum_x = 0;
-          for ( var i = 0; i < cluster.length; i++ ) {
-            sum_x += cluster[i].position('x');
-          }
-          newCentroid.position('x', sum_x / cluster.length);
+          var dim = opts.attributes.length,
+              sum = new Array(dim),
+              centroid = centroids[c], // [ dim_1, dim_2, dim_3, ... , dim_n ]
+              newCentroid = new Array(dim);
 
-          var sum_y = 0;
-          for ( var j = 0; j < cluster.length; j++ ) {
-            sum_y += cluster[j].position('y');
+          // for each dim
+          for (var d = 0; d < dim; d++) {
+            sum[d] = 0.0;
+            // get avg of attrib from each node
+            for ( var i = 0; i < cluster.length; i++ ) {
+              node = cluster[i];
+              sum[d] += opts.attributes[d](node);
+            }
           }
-          newCentroid.position('y', sum_y / cluster.length);
 
-          // Check to see if algorithm has converged, i.e. when centroid positions no longer change
-          if (newCentroid.position('x') != centroid.position('x') || newCentroid.position('y') != centroid.position('y')) {
-            movement = true;
+          for (d = 0; d < dim; d++) {
+            newCentroid[d] = sum[d] / cluster.length;
+          }
+
+          // Check to see if algorithm has converged across all dim, i.e. when centroid positions no longer change
+          for (d = 0; d < dim; d++) {
+            if (!hasConverged(newCentroid[d], centroid[d])) // has not converged across this dimension
+                movement = true;
           }
 
           centroids[c] = newCentroid;
