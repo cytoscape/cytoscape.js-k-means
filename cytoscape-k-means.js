@@ -22,47 +22,61 @@
   };
 
   var distances = {
-    euclidean: function (v1, v2, attributes) {
+    euclidean: function (node, centroid, attributes) {
       var total = 0;
-      for (var f in attributes) {
-        total += Math.pow(f(v2) - f(v1), 2);
+      for (var dim = 0; dim < attributes.length; dim++) {
+        total += Math.pow(attributes[dim](node) - centroid[dim], 2);
       }
       return Math.sqrt(total);
     },
-    manhattan: function (v1, v2, attributes) {
+    manhattan: function (node, centroid, attributes) {
       var total = 0;
-      for (var f in attributes) {
-        total += Math.abs(f(v2) - f(v1));
+      for (var dim = 0; dim < attributes.length; dim++) {
+        total += Math.abs(attributes[dim](node) - centroid[dim]);
       }
       return total;
     },
-    max: function (v1, v2, attributes) {
+    max: function (node, centroid, attributes) {
       var max = 0;
-      for (var f in attributes) {
-        max = Math.max(max, Math.abs(f(v2) - f(v1)));
+      for (var dim = 0; dim < attributes.length; dim++) {
+        max = Math.max(max, Math.abs(attributes[dim](node) - centroid[dim]));
       }
       return max;
     }
   };
 
-  var randomCentroids = function(nodes, k) {
-    var centroids = nodes.sort(function(a, b) {
-      return (Math.round(Math.random()) - 0.5);
-    });
-    return centroids.slice(0, k);
+  var randomCentroids = function( nodes, k, attributes ) {
+    var dim = attributes.length,
+        min = new Array(dim),
+        max = new Array(dim),
+        centroids = new Array(k);
+
+    // Find min, max values across each attribute dimension
+    for (var i = 0; i < dim; i++) {
+      min[i] = nodes.min( attributes[i] ).value;
+      max[i] = nodes.max( attributes[i] ).value;
+    }
+
+    // Build k centroids, each represented as an n-dim feature vector
+    for (var c = 0; c < k; c++) {
+      var centroid = [];
+      for (i = 0; i < dim; i++) {
+        centroid[i] = Math.random() * (max[i] - min[i]) + min[i]; // random initial value
+      }
+      centroids[c] = centroid;
+    }
+
+    return centroids;
   };
 
-  var classify = function(point, centroids, distance, attributes) {
+  var classify = function(node, centroids, distance, attributes) {
     var min = Infinity,
         index = 0;
 
-    distance = distance || "euclidean";
-    if (typeof distance == "string") {
-      distance = distances[distance];
-    }
+    distance = distances[distance];
 
     for (var i = 0; i < centroids.length; i++) {
-      var dist = distance(point, centroids[i], attributes);
+      var dist = distance(node, centroids[i], attributes);
       if (dist < min) {
         min = dist;
         index = i;
@@ -90,7 +104,7 @@
       // Begin k-means algorithm
 
       // Step 1: Initialize centroid positions
-      var centroids = randomCentroids(nodes, opts.k);
+      var centroids = randomCentroids(nodes, opts.k, opts.attributes);
       var assignment = {};
       var clusters = new Array(opts.k);
 
