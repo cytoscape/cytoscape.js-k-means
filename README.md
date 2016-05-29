@@ -4,13 +4,16 @@ cytoscape-k-means
 
 ## Description
 
-The k-means algorithm for Cytoscape.js
+![Screenshot of clusters returned from K-Means algorithm](./demo-img.png?raw=true "Screenshot of clusters returned from K-Means algorithm")
+
+A basic k-means algorithm for Cytoscape.js.
+
+*Zoe Xi, for Google Summer of Code.*
 
 
 ## Dependencies
 
- * Cytoscape.js >=x.y.z
- * <List your dependencies here please>
+ * Cytoscape.js >=2.6.12
 
 
 ## Usage instructions
@@ -42,13 +45,23 @@ Plain HTML/JS has the extension registered for you automatically, because no `re
 
 ## API
 
-Please briefly describe your API here:
-
 ```js
 cy.elements().kMeans({
-  foo: 'bar', // some option that does this
-  baz: 'bat' // some options that does that
-  // ... and so on
+  k: '3',                               // number of clusters to return
+  distance: 'euclidean',                // distance classifier
+  maxIterations: 12,                    // maximum number of interations of the k-means algorithm in a single run
+  attributes: [                         // attributes/features used to group nodes
+      function(node) {
+          return node.data('attrA');
+      },
+      function(node) {
+          return node.data('attrB');
+      },
+      function(node) {
+          return node.data('attrC');
+      },
+      // And so on...
+  ]
 });
 ```
 
