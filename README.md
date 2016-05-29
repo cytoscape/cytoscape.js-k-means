@@ -1,16 +1,13 @@
 cytoscape-k-means
 ================================================================================
 
-[![Join the chat at https://gitter.im/cytoscape/cytoscape.js-k-means](https://badges.gitter.im/cytoscape/cytoscape.js-k-means.svg)](https://gitter.im/cytoscape/cytoscape.js-k-means?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-
-## Description
-
 ![Screenshot of clusters returned from K-Means algorithm](./demo-img.png?raw=true "Screenshot of clusters returned from K-Means algorithm")
 
 A basic k-means algorithm for Cytoscape.js.
 
 *Zoe Xi, for Google Summer of Code.*
+
+[![Join the chat at https://gitter.im/cytoscape/cytoscape.js-k-means](https://badges.gitter.im/cytoscape/cytoscape.js-k-means.svg)](https://gitter.im/cytoscape/cytoscape.js-k-means?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
 ## Dependencies
