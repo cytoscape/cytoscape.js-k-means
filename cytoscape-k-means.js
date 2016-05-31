@@ -46,11 +46,11 @@
   };
 
   var randomCentroids = function( nodes, k, attributes ) {
-    var ndim = attributes.length,
-        min  = new Array(ndim),
-        max  = new Array(ndim),
-        centroids = new Array(k),
-        centroid  = null;
+    var ndim = attributes.length;
+    var min  = new Array(ndim);
+    var max  = new Array(ndim);
+    var centroids = new Array(k);
+    var centroid  = null;
 
     // Find min, max values for each attribute dimension
     for ( var i = 0; i < ndim; i++ ) {
@@ -71,8 +71,8 @@
   };
 
   var classify = function( node, centroids, distance, attributes ) {
-    var min   = Infinity,
-        index = 0;
+    var min   = Infinity;
+    var index = 0;
 
     distance = distances[distance];
 
@@ -93,85 +93,88 @@
     return v1 === v2;
   };
 
+  var kMeans = function( options ){
+    var cy    = this.cy();
+    var nodes = this.nodes();
+    var node  = null;
+    var opts  = {};
+
+    // Set parameters of algorithm: # of clusters, distance metric, etc.
+    setOptions( opts, options );
+
+    // Begin k-means algorithm
+    var clusters   = new Array(opts.k);
+    var assignment = {};
+
+    // Step 1: Initialize centroid positions
+    var centroids = randomCentroids( nodes, opts.k, opts.attributes );
+    var isStillMoving = true;
+    var iterations = 0;
+
+    while ( isStillMoving && iterations < opts.maxIterations ) {
+
+      // Step 2: Assign nodes to the nearest centroid
+      for ( var n = 0; n < nodes.length; n++ ) {
+        node = nodes[n];
+        // Determine which cluster this node belongs to: node id => cluster #
+        assignment[ node.id() ] = classify( node, centroids, opts.distance, opts.attributes );
+      }
+
+      // Step 3: For each of the k clusters, update its centroid
+      isStillMoving = false;
+      for ( var c = 0; c < opts.k; c++ ) {
+        var cluster = cy.collection();
+
+        // Get all nodes that belong to this cluster
+        for ( n = 0; n < nodes.length; n++ ) {
+          node = nodes[n];
+          if ( assignment[ node.id() ] === c ) {
+            //console.log("Node " + node.id() + " belongs in cluster " + c);
+            cluster = cluster.union( node );
+          }
+        }
+
+        if ( cluster.empty() ) { // If cluster is empty, break out early & move to next cluster
+          continue;
+        }
+
+        // Update centroids by calculating avg of all nodes within the cluster.
+        var ndim        = opts.attributes.length;
+        var centroid    = centroids[c];           // [ dim_1, dim_2, dim_3, ... , dim_n ]
+        var newCentroid = new Array(ndim);
+        var sum         = new Array(ndim);
+
+        for ( var d = 0; d < ndim; d++ ) {
+          sum[d] = 0.0;
+          for ( var i = 0; i < cluster.length; i++ ) {
+            node = cluster[i];
+            sum[d] += opts.attributes[d](node);
+          }
+          newCentroid[d] = sum[d] / cluster.length;
+
+          // Check to see if algorithm has converged, i.e. when centroids no longer change
+          if ( !hasConverged(newCentroid[d], centroid[d], 4) ) { // approximates to 4 decimal places
+            isStillMoving = true;
+          }
+        }
+
+        centroids[c] = newCentroid;
+        clusters[c]  = cluster;
+      }
+
+      iterations++;
+    }
+
+    return clusters;
+  };
+
   // registers the extension on a cytoscape lib ref
   var register = function( cytoscape ){
 
     if( !cytoscape ){ return; } // can't register if cytoscape unspecified
-    
-    cytoscape( 'collection', 'kMeans', function( options ){
-      var cy    = this.cy(),
-          nodes = this.nodes(),
-          node  = null,
-          opts  = {};
 
-      // Set parameters of algorithm: # of clusters, distance metric, etc.
-      setOptions( opts, options );
-
-      // Begin k-means algorithm
-      var clusters   = new Array(opts.k),
-          assignment = {};
-
-      // Step 1: Initialize centroid positions
-      var centroids  = randomCentroids( nodes, opts.k, opts.attributes ),
-          isStillMoving   = true,
-          iterations = 0;
-
-      while ( isStillMoving && iterations < opts.maxIterations ) {
-
-        // Step 2: Assign nodes to the nearest centroid
-        for ( var n = 0; n < nodes.length; n++ ) {
-          node = nodes[n];
-          // Determine which cluster this node belongs to: node id => cluster #
-          assignment[ node.id() ] = classify( node, centroids, opts.distance, opts.attributes );
-        }
-
-        // Step 3: For each of the k clusters, update its centroid
-        isStillMoving = false;
-        for ( var c = 0; c < opts.k; c++ ) {
-          var cluster = cy.collection();
-
-          // Get all nodes that belong to this cluster
-          for ( n = 0; n < nodes.length; n++ ) {
-            node = nodes[n];
-            if ( assignment[ node.id() ] === c ) {
-              //console.log("Node " + node.id() + " belongs in cluster " + c);
-              cluster = cluster.union( node );
-            }
-          }
-
-          if ( cluster.empty() ) { // If cluster is empty, break out early & move to next cluster
-            continue;
-          }
-
-          // Update centroids by calculating avg of all nodes within the cluster.
-          var ndim        = opts.attributes.length,
-              centroid    = centroids[c],           // [ dim_1, dim_2, dim_3, ... , dim_n ]
-              newCentroid = new Array(ndim),
-              sum         = new Array(ndim);
-
-          for ( var d = 0; d < ndim; d++ ) {
-            sum[d] = 0.0;
-            for ( var i = 0; i < cluster.length; i++ ) {
-              node = cluster[i];
-              sum[d] += opts.attributes[d](node);
-            }
-            newCentroid[d] = sum[d] / cluster.length;
-
-            // Check to see if algorithm has converged, i.e. when centroids no longer change
-            if ( !hasConverged(newCentroid[d], centroid[d], 4) ) { // approximates to 4 decimal places
-              isStillMoving = true;
-            }
-          }
-
-          centroids[c] = newCentroid;
-          clusters[c] = cluster;
-        }
-
-        iterations++;
-      }
-      
-      return clusters;
-    } );
+    // main entry point
+    cytoscape( 'collection', 'kMeans', kMeans );
 
   };
 
