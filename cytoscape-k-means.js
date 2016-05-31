@@ -123,18 +123,18 @@
       // Step 3: For each of the k clusters, update its centroid
       isStillMoving = false;
       for ( var c = 0; c < opts.k; c++ ) {
-        var cluster = cy.collection();
+        var cluster = [];
 
         // Get all nodes that belong to this cluster
         for ( n = 0; n < nodes.length; n++ ) {
           node = nodes[n];
           if ( assignment[ node.id() ] === c ) {
             //console.log("Node " + node.id() + " belongs in cluster " + c);
-            cluster = cluster.union( node );
+            cluster.push( node );
           }
         }
 
-        if ( cluster.empty() ) { // If cluster is empty, break out early & move to next cluster
+        if ( cluster.length === 0 ) { // If cluster is empty, break out early & move to next cluster
           continue;
         }
 
@@ -159,7 +159,7 @@
         }
 
         centroids[c] = newCentroid;
-        clusters[c]  = cluster;
+        clusters[c]  = cy.collection( cluster );
       }
 
       iterations++;
