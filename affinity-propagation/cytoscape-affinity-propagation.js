@@ -128,7 +128,7 @@
     return true;
   };
 
-  var affinity-propagation = function( options ){
+  var affinityPropagation = function( options ){
     var cy    = this.cy();
     var nodes = this.nodes();
     var opts  = {};
@@ -192,7 +192,7 @@
     if( !cytoscape ){ return; } // can't register if cytoscape unspecified
 
     // main entry point
-    cytoscape( 'collection', 'affinity-propagation', affinity-propagation );
+    cytoscape( 'collection', 'affinityPropagation', affinityPropagation );
 
   };
 

@@ -69,7 +69,7 @@
                 }
             });
 
-            // Input parameters to affinity-propagation algorithm
+            // Input parameters to affinity propagation algorithm
             var options = {
                 distance: "euclidean",
                 linkage: "single",
@@ -77,7 +77,7 @@
             };
 
             // Run affinity-propagation on graph nodes
-            var clusters = cy.elements().affinity-propagation( options );
+            var clusters = cy.elements().affinityPropagation( options );
 
             // Assign random colors to each cluster!
             for (var c = 0; c < clusters.length; c++) {
