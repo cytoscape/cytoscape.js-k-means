@@ -1,0 +1,34 @@
+{
+  "name": "cytoscape-affinity-propagation",
+  "version": "1.0.0",
+  "description": "The affinity-propagation algorithm for Cytoscape.js",
+  "main": "cytoscape-affinity-propagation.js",
+  "spm": {
+    "main": "cytoscape-affinity-propagation.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cytoscape/cytoscape.js-affinity-propagation.git"
+  },
+  "keywords": [
+    "cytoscape",
+    "cyext"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cytoscape/cytoscape.js-affinity-propagation/issues"
+  },
+  "homepage": "https://github.com/cytoscape/cytoscape.js-affinity-propagation",
+  "devDependencies": {
+    "gulp": "^3.8.8",
+    "gulp-jshint": "^1.8.5",
+    "gulp-prompt": "^0.1.1",
+    "gulp-replace": "^0.4.0",
+    "gulp-shell": "^0.2.9",
+    "jshint-stylish": "^1.0.0",
+    "run-sequence": "^1.0.0"
+  }
+}

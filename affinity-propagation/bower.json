@@ -1,0 +1,22 @@
+{
+  "name": "cytoscape-affinity-propagation",
+  "version": "1.0.0",
+  "description": "The affinity-propagation algorithm for Cytoscape.js",
+  "main": "cytoscape-affinity-propagation.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cytoscape/cytoscape.js-affinity-propagation.git"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "keywords": [
+    "cytoscape",
+    "cyext"
+  ],
+  "license": "MIT"
+}
