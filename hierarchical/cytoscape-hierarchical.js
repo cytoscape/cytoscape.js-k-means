@@ -46,25 +46,26 @@
   };
 
   var mergeClosest = function( clusters, index, dists, mins, opts ) {
-    // find two closest clusters from cached mins
-    var minKey = 0,
-        min = Infinity;
-    for (var i = 0; i < clusters.length; i++) {
-      var key = clusters[i].key,
-          dist = dists[key][mins[key]];
-      if (dist < min) {
+    // Find two closest clusters from cached mins
+    var minKey = 0;
+    var min = Infinity;
+
+    for ( var i = 0; i < clusters.length; i++ ) {
+      var key  = clusters[i].key;
+      var dist = dists[key][mins[key]];
+      if ( dist < min ) {
         minKey = key;
         min = dist;
       }
     }
-    if (min >= opts.threshold) {
+    if ( min >= opts.threshold ) {
       return false;
     }
 
-    var c1 = index[minKey],
-        c2 = index[mins[minKey]];
+    var c1 = index[minKey];
+    var c2 = index[mins[minKey]];
 
-    // merge two closest clusters
+    // Merge two closest clusters
     var merged = {
       value: c1.value.concat(c2.value),
       key: c1.key,
@@ -75,28 +76,27 @@
     clusters.splice(c2.index, 1);
     index[c1.key] = merged;
 
-    // update distances with new merged cluster
-    for (var i = 0; i < clusters.length; i++) {
+    // Update distances with new merged cluster
+    for ( var i = 0; i < clusters.length; i++ ) {
       var ci = clusters[i];
       var dist;
-      if (c1.key == ci.key) {
+      if ( c1.key === ci.key ) {
         dist = Infinity;
       }
-      else if (opts.linkage == "single") {
+      else if ( opts.linkage === 'single' ) {
         dist = dists[c1.key][ci.key];
-        if (dists[c1.key][ci.key] > dists[c2.key][ci.key]) {
+        if ( dists[c1.key][ci.key] > dists[c2.key][ci.key] ) {
           dist = dists[c2.key][ci.key];
         }
       }
-      else if (opts.linkage == "complete") {
+      else if ( opts.linkage === 'complete' ) {
         dist = dists[c1.key][ci.key];
-        if (dists[c1.key][ci.key] < dists[c2.key][ci.key]) {
+        if ( dists[c1.key][ci.key] < dists[c2.key][ci.key] ) {
           dist = dists[c2.key][ci.key];
         }
       }
-      else if (opts.linkage == "average") {
-        dist = (dists[c1.key][ci.key] * c1.size
-            + dists[c2.key][ci.key] * c2.size) / (c1.size + c2.size);
+      else if ( opts.linkage === 'average' ) {
+        dist = (dists[c1.key][ci.key] * c1.size + dists[c2.key][ci.key] * c2.size) / (c1.size + c2.size);
       }
       else {
         dist = distances[opts.distance]( ci.value[0], c1.value[0], opts.attributes );
@@ -105,14 +105,14 @@
       dists[c1.key][ci.key] = dists[ci.key][c1.key] = dist;
     }
 
-    // update cached mins
-    for (var i = 0; i < clusters.length; i++) {
+    // Update cached mins
+    for ( var i = 0; i < clusters.length; i++ ) {
       var key1 = clusters[i].key;
-      if (mins[key1] == c1.key || mins[key1] == c2.key) {
+      if ( mins[key1] === c1.key || mins[key1] === c2.key ) {
         var min = key1;
-        for (var j = 0; j < clusters.length; j++) {
+        for ( var j = 0; j < clusters.length; j++ ) {
           var key2 = clusters[j].key;
-          if (dists[key1][key2] < dists[key1][min]) {
+          if ( dists[key1][key2] < dists[key1][min] ) {
             min = key2;
           }
         }
@@ -121,7 +121,7 @@
       clusters[i].index = i;
     }
 
-    // clean up metadata used for clustering
+    // Clean up meta data used for clustering
     delete c1.key; delete c2.key;
     delete c1.index; delete c2.index;
 
@@ -131,7 +131,6 @@
   var hierarchical = function( options ){
     var cy    = this.cy();
     var nodes = this.nodes();
-    var node  = null;
     var opts  = {};
 
     // Set parameters of algorithm: # of clusters, distance metric, etc.
@@ -143,8 +142,8 @@
     var mins     = [];
     var index    = [];
 
-    // In agglomerative (bottom-up) version, each node starts as its own cluster.
-    for (var n = 0; n < nodes.length; n++) {
+    // In agglomerative (bottom-up) version, each node starts as its own cluster
+    for ( var n = 0; n < nodes.length; n++ ) {
       var cluster = {
         value: [ nodes[n] ],
         key:   n,
@@ -158,13 +157,13 @@
     }
 
     // Initiate distance matrix
-    for (var i = 0; i < clusters.length; i++) {
-      for (var j = 0; j <= i; j++) {
-        var dist = (i == j) ? Infinity : distances[opts.distance]( clusters[i].value[0], clusters[j].value[0], opts.attributes );
+    for ( var i = 0; i < clusters.length; i++ ) {
+      for ( var j = 0; j <= i; j++ ) {
+        var dist = (i === j) ? Infinity : distances[opts.distance]( clusters[i].value[0], clusters[j].value[0], opts.attributes );
         dists[i][j] = dist;
         dists[j][i] = dist;
 
-        if (dist < dists[i][mins[i]]) {
+        if ( dist < dists[i][mins[i]] ) {
           mins[i] = j;
         }
       }
