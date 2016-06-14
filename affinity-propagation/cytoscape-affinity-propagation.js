@@ -39,21 +39,22 @@
     return M;
   };
 
-  var getPreference = function( S, preference ) { // Larger preferences = greater number of clusters, and vice versa
+  var getPreference = function( S, preference, n ) { // Larger preferences = greater number of clusters, and vice versa
     var p = null;
     
     if ( preference === 'median' ) { // Set preference to median of similarities
       var arr = sortBy( S );
+      var offset = n; // offset is needed to avoid -Infinity values since after sortBy, they will populate the first n indices
       if ( arr.length % 2 === 0 ) {
-        p = (arr[arr.length / 2] + arr[arr.length / 2 - 1]) / 2;
+        p = (arr[arr.length / 2 + offset] + arr[arr.length / 2 - 1 + offset]) / 2;
       }
       else {
-        p = arr[Math.floor(arr.length / 2)];
+        p = arr[Math.floor(arr.length / 2) + 1 + offset];
       }
     }
     else if ( preference === 'min' ) { // Set preference to minimum of similarities (yields smaller number of clusters)
       var arr = sortBy( S );
-      p = arr[0];
+      p = arr[offset]; // smallest non -Infinity value
     }
     else if ( isFinite(preference) ) { // Custom preference number, as set by user
       p = preference;
@@ -107,7 +108,7 @@
     }
 
     // Place preferences on the diagonal of S
-    p = getPreference( S, opts.preference );
+    p = getPreference( S, opts.preference, n );
     for ( var i = 0; i < n; i++ ) {
       S[i * n + i] = p;
     }
