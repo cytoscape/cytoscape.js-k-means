@@ -15,12 +15,11 @@
     if (options.damping < 0.5 || options.damping >= 1) {
       throw { name: 'ArgumentError', message: ': damping must be >= 0.5 and < 1' };
     }
-
     for (var i in defaults) { opts[i] = defaults[i]; }
     for (var i in options)  { opts[i] = options[i];  }
   };
 
-  var printMatrix = function( M ) { // used for debugging only
+  var printMatrix = function( M ) { // used for debugging purposes only
     var n = Math.sqrt(M.length);
     for(var i = 0; i < n; i++ ) {
       var row = '';
@@ -45,7 +44,6 @@
     
     if ( preference === 'median' ) { // Set preference to median of similarities
       var arr = sortBy( S );
-
       if ( arr.length % 2 === 0 ) {
         p = (arr[arr.length / 2] + arr[arr.length / 2 - 1]) / 2;
       }
@@ -105,7 +103,7 @@
       var edge = edges[e];
       var i = id2position[ edge.source().id() ];
       var j = id2position[ edge.target().id() ];
-      S[i * n + j] = edge.data('weight');         // similarity values are placed on edge weights
+      S[i * n + j] = edge.data('weight');         // similarity values S(i,j) are retrieved from edge weights
     }
 
     // Place preferences on the diagonal of S
@@ -126,8 +124,36 @@
       A[i] = 0.0;
     }
 
-    //printMatrix(S);
-    //debugger;
+    var old = new Array(n2);
+    var Rp  = new Array(n2);
+    var se  = new Array(n2);
+
+    for ( var i = 0; i < n; i ++ ) {
+      old[i] = 0.0;
+      Rp[i]  = 0.0;
+      se[i]  = 0;
+    }
+
+    var e = new Array(n * opts.convIterations);
+    for ( var i = 0; i < e.length; i++ ) {
+      e[i] = 0;
+    }
+
+    var iter, converged = false;
+    for ( iter = 0; iter < opts.maxIterations; iter++ ) { // main algorithmic loop
+
+      // Update R responsibility matrix
+
+
+      // Update A availability matrix
+
+
+      // Check for convergence
+
+
+    }
+
+    // Format clusters before returning
 
     return clusters;
   };

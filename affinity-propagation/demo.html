@@ -3,95 +3,95 @@
 <html>
 
 <head>
-	<title>cytoscape-affinity-propagation.js demo</title>
+    <title>cytoscape-affinity-propagation.js demo</title>
 
-	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
 
-	<!--<script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>-->
+    <!--<script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>-->
 
-	<!-- for testing with local version of cytoscape.js -->
-	<script src="../../cytoscape.js/build/cytoscape.js"></script>
+    <!-- for testing with local version of cytoscape.js -->
+    <script src="../../cytoscape.js/build/cytoscape.js"></script>
 
-	<script src="cytoscape-affinity-propagation.js"></script>
+    <script src="cytoscape-affinity-propagation.js"></script>
 
-	<style>
-		body {
-			font-family: helvetica neue, helvetica, liberation sans, arial, sans-serif;
-			font-size: 14px;
-		}
+    <style>
+        body {
+            font-family: helvetica neue, helvetica, liberation sans, arial, sans-serif;
+            font-size: 14px;
+        }
 
-		#cy {
-			position: absolute;
-			left: 0;
-			top: 0;
-			bottom: 0;
-			right: 0;
-			z-index: 999;
-		}
+        #cy {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            z-index: 999;
+        }
 
-		h1 {
-			opacity: 0.5;
-			font-size: 1em;
-			font-weight: bold;
-		}
-	</style>
+        h1 {
+            opacity: 0.5;
+            font-size: 1em;
+            font-weight: bold;
+        }
+    </style>
 
-	<script>
-		document.addEventListener('DOMContentLoaded', function(){
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
 
-			var cy = window.cy = cytoscape({
-				container: document.getElementById('cy'),
+            var cy = window.cy = cytoscape({
+                container: document.getElementById('cy'),
 
-				style: [
-					{
-						selector: 'node',
-						style: {
-							'content': 'data(id)'
-						}
-					},
+                style: [
+                    {
+                        selector: 'node',
+                        style: {
+                            'content': 'data(id)'
+                        }
+                    },
 
-					{
-						selector: 'edge',
-						style: {
-							'content': 'data(similarity)',
-							'curve-style': 'haystack',
-							'haystack-radius': 0,
-							'width': 2,
-							'opacity': 0.666,
-							'line-color': '#d4ebf2'
-						}
-					}
-				],
+                    {
+                        selector: 'edge',
+                        style: {
+                            'content': 'data(similarity)',
+                            'curve-style': 'haystack',
+                            'haystack-radius': 0,
+                            'width': 2,
+                            'opacity': 0.666,
+                            'line-color': '#d4ebf2'
+                        }
+                    }
+                ],
 
-				elements: { // 2D data points obtained from: http://www.psi.toronto.edu/index.php?q=affinity%20propagation
-					nodes: [
-						{ data: { id: '001' }, position: { x: -2.341500, y: 3.696800 } },
-						{ data: { id: '002' }, position: { x: -1.109200, y: 3.111700 } },
-						{ data: { id: '003' }, position: { x: -1.566900, y: 1.835100 } },
-						{ data: { id: '004' }, position: { x: -2.658500, y: 0.664900 } },
-						{ data: { id: '005' }, position: { x: -4.031700, y: 2.845700 } },
-						{ data: { id: '006' }, position: { x: -3.081000, y: 2.101100 } },
-						{ data: { id: '007' }, position: { x: 2.588000, y: 1.781900 } },
-						{ data: { id: '008' }, position: { x: 3.292300, y: 3.058500 } },
-						{ data: { id: '009' }, position: { x: 4.031700, y: 1.622300 } },
-						{ data: { id: '010' }, position: { x: 3.081000, y: -0.611700 } },
-						{ data: { id: '011' }, position: { x: 0.264100, y: 0.398900 } },
-						{ data: { id: '012' }, position: { x: 1.320400, y: 2.207400 } },
-						{ data: { id: '013' }, position: { x: 0.193700, y: 3.643600 } },
-						{ data: { id: '014' }, position: { x: 1.954200, y: -0.505300 } },
-						{ data: { id: '015' }, position: { x: 1.637300, y: 1.409600 } },
-						{ data: { id: '016' }, position: { x: -0.123200, y: -1.516000 } },
-						{ data: { id: '017' }, position: { x: -1.355600, y: -3.058500 } },
-						{ data: { id: '018' }, position: { x: 0.017600, y: -4.016000 } },
-						{ data: { id: '019' }, position: { x: 1.003500, y: -3.590400 } },
-						{ data: { id: '020' }, position: { x: 0.017600, y: -2.420200 } },
-						{ data: { id: '021' }, position: { x: -1.531700, y: -0.930900 } },
-						{ data: { id: '022' }, position: { x: -1.144400, y: 0.505300 } },
-						{ data: { id: '023' }, position: { x: 0.616200, y: -1.516000 } },
-						{ data: { id: '024' }, position: { x: 1.707700, y: -2.207400 } },
-						{ data: { id: '025' }, position: { x: 2.095100, y: 3.430900 } }
-					],
-					edges: [
+                elements: { // 2D data points obtained from: http://www.psi.toronto.edu/index.php?q=affinity%20propagation
+                    nodes: [
+                        { data: { id: '001' }, position: { x: -2.341500, y: 3.696800 } },
+                        { data: { id: '002' }, position: { x: -1.109200, y: 3.111700 } },
+                        { data: { id: '003' }, position: { x: -1.566900, y: 1.835100 } },
+                        { data: { id: '004' }, position: { x: -2.658500, y: 0.664900 } },
+                        { data: { id: '005' }, position: { x: -4.031700, y: 2.845700 } },
+                        { data: { id: '006' }, position: { x: -3.081000, y: 2.101100 } },
+                        { data: { id: '007' }, position: { x: 2.588000, y: 1.781900 } },
+                        { data: { id: '008' }, position: { x: 3.292300, y: 3.058500 } },
+                        { data: { id: '009' }, position: { x: 4.031700, y: 1.622300 } },
+                        { data: { id: '010' }, position: { x: 3.081000, y: -0.611700 } },
+                        { data: { id: '011' }, position: { x: 0.264100, y: 0.398900 } },
+                        { data: { id: '012' }, position: { x: 1.320400, y: 2.207400 } },
+                        { data: { id: '013' }, position: { x: 0.193700, y: 3.643600 } },
+                        { data: { id: '014' }, position: { x: 1.954200, y: -0.505300 } },
+                        { data: { id: '015' }, position: { x: 1.637300, y: 1.409600 } },
+                        { data: { id: '016' }, position: { x: -0.123200, y: -1.516000 } },
+                        { data: { id: '017' }, position: { x: -1.355600, y: -3.058500 } },
+                        { data: { id: '018' }, position: { x: 0.017600, y: -4.016000 } },
+                        { data: { id: '019' }, position: { x: 1.003500, y: -3.590400 } },
+                        { data: { id: '020' }, position: { x: 0.017600, y: -2.420200 } },
+                        { data: { id: '021' }, position: { x: -1.531700, y: -0.930900 } },
+                        { data: { id: '022' }, position: { x: -1.144400, y: 0.505300 } },
+                        { data: { id: '023' }, position: { x: 0.616200, y: -1.516000 } },
+                        { data: { id: '024' }, position: { x: 1.707700, y: -2.207400 } },
+                        { data: { id: '025' }, position: { x: 2.095100, y: 3.430900 } }
+                    ],
+                    edges: [
                         { data: { source: '001', target: '002', weight: -1.860905 } },
                         { data: { source: '001', target: '003', weight: -4.065932 } },
                         { data: { source: '001', target: '004', weight: -9.292907 } },
@@ -692,36 +692,36 @@
                         { data: { source: '025', target: '022', weight: -19.053496 } },
                         { data: { source: '025', target: '023', weight: -26.658965 } },
                         { data: { source: '025', target: '024', weight: -31.940506 } }
-					]
-				},
+                    ]
+                },
 
-				layout: {
-					name: 'preset',
+                layout: {
+                    name: 'preset',
                     positions: function(node) {
                         return { x: node.position('x')*100, y: node.position('y')*100 };
                     },
                     fit: true,
                     padding: 40
-				}
-			});
+                }
+            });
 
-			// Input parameters to affinity propagation algorithm
-			var options = {
-				distance: "euclidean",
-				linkage: "single",
-				threshold: 25
-			};
+            // Input parameters to affinity propagation algorithm
+            var options = {
+                preference: 'median',
+                damping: 0.6,
+                maxIterations: 500
+            };
 
-			// Run affinity propagation on graph nodes
-			var clusters = cy.elements().affinityPropagation( options );
+            // Run affinity propagation on graph nodes
+            var clusters = cy.elements().affinityPropagation( options );
 
-			// Assign random colors to each cluster!
-			for (var c = 0; c < clusters.length; c++) {
-				clusters[c].style( 'background-color', '#' + Math.floor(Math.random()*16777215).toString(16) );
-			}
+            // Assign random colors to each cluster!
+            for (var c = 0; c < clusters.length; c++) {
+                clusters[c].style( 'background-color', '#' + Math.floor(Math.random()*16777215).toString(16) );
+            }
 
-		});
-	</script>
+        });
+    </script>
 </head>
 
 <body>
