@@ -133,57 +133,14 @@
     var nodes = this.nodes();
     var opts  = {};
 
-    // Set parameters of algorithm: # of clusters, distance metric, etc.
+    // Set parameters of algorithm:
     setOptions( opts, options );
 
     // Begin affinity-propagation algorithm
-    var clusters = new Array(nodes.length);
-    var dists    = [];
-    var mins     = [];
-    var index    = [];
+    var clusters = [];
 
-    // In agglomerative (bottom-up) version, each node starts as its own cluster
-    for ( var n = 0; n < nodes.length; n++ ) {
-      var cluster = {
-        value: [ nodes[n] ],
-        key:   n,
-        index: n,
-        size:  1
-      };
-      clusters[n] = cluster;
-      index[n]    = cluster;
-      dists[n]    = [];
-      mins[n]     = 0;
-    }
 
-    // Initiate distance matrix
-    for ( var i = 0; i < clusters.length; i++ ) {
-      for ( var j = 0; j <= i; j++ ) {
-        var dist = (i === j) ? Infinity : distances[opts.distance]( clusters[i].value[0], clusters[j].value[0], opts.attributes );
-        dists[i][j] = dist;
-        dists[j][i] = dist;
-
-        if ( dist < dists[i][mins[i]] ) {
-          mins[i] = j;
-        }
-      }
-    }
-
-    var merged = mergeClosest( clusters, index, dists, mins, opts );
-    while ( merged ) {
-      merged = mergeClosest( clusters, index, dists, mins, opts );
-    }
-
-    var retClusters = new Array(clusters.length);
-    clusters.forEach( function( cluster, i ) {
-      // Clean up meta data used for clustering
-      delete cluster.key;
-      delete cluster.index;
-
-      retClusters[i] = cy.collection( cluster.value );
-    });
-
-    return retClusters;
+    return clusters;
   };
 
   // registers the extension on a cytoscape lib ref
