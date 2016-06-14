@@ -133,7 +133,7 @@
     var nodes = this.nodes();
     var opts  = {};
 
-    // Set parameters of algorithm: # of clusters, distance metric, etc.
+    // Set parameters of algorithm: linkage type, distance metric, etc.
     setOptions( opts, options );
 
     // Begin hierarchical algorithm

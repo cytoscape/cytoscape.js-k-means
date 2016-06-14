@@ -63,7 +63,7 @@
 					}
 				],
 
-				elements: {
+				elements: { // 2D data points obtained from: http://www.psi.toronto.edu/index.php?q=affinity%20propagation
 					nodes: [
 						{ data: { id: '001' }, position: { x: -2.341500, y: 3.696800 } },
 						{ data: { id: '002' }, position: { x: -1.109200, y: 3.111700 } },
@@ -712,7 +712,7 @@
 				threshold: 25
 			};
 
-			// Run affinity-propagation on graph nodes
+			// Run affinity propagation on graph nodes
 			var clusters = cy.elements().affinityPropagation( options );
 
 			// Assign random colors to each cluster!
