@@ -1,4 +1,4 @@
-cytoscape-k-means
+cytoscape-k-means and cytoscape-k-medoids
 ================================================================================
 
 ![Screenshot of clusters returned from K-Means algorithm](./demo-img.png?raw=true "Screenshot of clusters returned from K-Means algorithm")
@@ -43,27 +43,33 @@ Plain HTML/JS has the extension registered for you automatically, because no `re
 
 
 ## API
+The k-means and k-medoids algorithms return an array of clusters generated from the nodes of the calling graph instance. Each cluster contains references to the nodes that belong to that cluster.
 
 ```js
-cy.elements().kMeans({
-  k: '3',                               // number of clusters to return
-  distance: 'euclidean',                // distance classifier
-  maxIterations: 12,                    // maximum number of interations of the k-means algorithm in a single run
-  attributes: [                         // attributes/features used to group nodes
-      function(node) {
-          return node.data('attrA');
-      },
-      function(node) {
-          return node.data('attrB');
-      },
-      function(node) {
-          return node.data('attrC');
-      },
-      // And so on...
-  ]
-});
+var options = {
+    k: '3',                               // number of clusters to return
+    distance: 'euclidean',                // distance classifier
+    maxIterations: 12,                    // maximum number of interations of the k-means algorithm in a single run
+    attributes: [                         // attributes/features used to group nodes
+        function(node) {
+            return node.data('attrA');
+        },
+        function(node) {
+            return node.data('attrB');
+        },
+        function(node) {
+            return node.data('attrC');
+        },
+        // And so on...
+    ]
+};
 
-cy.elements().kMedoids({
+var clusters = cy.elements().kMeans( options );
+
+// Do something cool with the nodes found in the first cluster.
+clusters[0].myFunc();
+
+var clusters = cy.elements().kMedoids({
 
     // Note: The same options apply for the k-medoids algorithm.
 
@@ -81,6 +87,9 @@ cy.elements().kMedoids({
 });
 ```
 
+#### Distance metric
+The metric used to measure the distance between two nodes. By default it is set to ```'euclidean'``` distance. It can be one of the pre-defined functions: ```'euclidean', 'manhattan', 'max'```,
+or you may create your own function within the [distances object](cytoscape-k-means.js) that returns a float representing the distance between two nodes.
 
 ## Publishing instructions
 

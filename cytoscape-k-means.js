@@ -22,27 +22,27 @@
   };
 
   var distances = {
-    euclidean: function ( node, centroid, attributes, type ) {
+    euclidean: function ( node, centroid, attributes, mode ) {
       var total = 0;
       for ( var dim = 0; dim < attributes.length; dim++ ) {
-        total += (type === 'vector') ? Math.pow( attributes[dim](node) - centroid[dim], 2 ) :
-             /* type === 'nodeObj' */  Math.pow( attributes[dim](node) - attributes[dim](centroid), 2 );
+        total += (mode === 'kMeans') ? Math.pow( attributes[dim](node) - centroid[dim], 2 ) :
+             /* mode === 'kMedoids' */ Math.pow( attributes[dim](node) - attributes[dim](centroid), 2 );
       }
       return Math.sqrt(total);
     },
-    manhattan: function ( node, centroid, attributes, type ) {
+    manhattan: function ( node, centroid, attributes, mode ) {
       var total = 0;
       for ( var dim = 0; dim < attributes.length; dim++ ) {
-        total += (type === 'vector') ? Math.abs( attributes[dim](node) - centroid[dim] ) :
-             /* type === 'nodeObj' */  Math.abs( attributes[dim](node) - attributes[dim](centroid) );
+        total += (mode === 'kMeans') ? Math.abs( attributes[dim](node) - centroid[dim] ) :
+             /* mode === 'kMedoids' */ Math.abs( attributes[dim](node) - attributes[dim](centroid) );
       }
       return total;
     },
-    max: function ( node, centroid, attributes, type ) {
+    max: function ( node, centroid, attributes, mode ) {
       var max = 0;
       for ( var dim = 0; dim < attributes.length; dim++ ) {
-        max = (type === 'vector') ? Math.max( max, Math.abs( attributes[dim](node) - centroid[dim] ) ) :
-          /* type === 'nodeObj' */  Math.max( max, Math.abs( attributes[dim](node) - attributes[dim](centroid) ) );
+        max = (mode === 'kMeans') ? Math.max( max, Math.abs( attributes[dim](node) - centroid[dim] ) ) :
+          /* mode === 'kMedoids' */ Math.max( max, Math.abs( attributes[dim](node) - attributes[dim](centroid) ) );
       }
       return max;
     }
@@ -148,7 +148,7 @@
   var findCost = function( potentialNewMedoid, cluster, attributes ) {
     var cost = 0;
     for ( var n = 0; n < cluster.length; n++ ) {
-      cost += distances['manhattan']( cluster[n], potentialNewMedoid, attributes, 'nodeObj' );
+      cost += distances['manhattan']( cluster[n], potentialNewMedoid, attributes, 'kMedoids' );
     }
     return cost;
   };
@@ -177,7 +177,7 @@
       for ( var n = 0; n < nodes.length; n++ ) {
         node = nodes[n];
         // Determine which cluster this node belongs to: node id => cluster #
-        assignment[ node.id() ] = classify( node, centroids, opts.distance, opts.attributes, 'vector' );
+        assignment[ node.id() ] = classify( node, centroids, opts.distance, opts.attributes, 'kMeans' );
       }
 
       // Step 3: For each of the k clusters, update its centroid
@@ -248,7 +248,7 @@
       for ( var n = 0; n < nodes.length; n++ ) {
         node = nodes[n];
         // Determine which cluster this node belongs to: node id => cluster #
-        assignment[ node.id() ] = classify( node, medoids, opts.distance, opts.attributes, 'nodeObj' );
+        assignment[ node.id() ] = classify( node, medoids, opts.distance, opts.attributes, 'kMedoids' );
       }
 
       isStillMoving = false;
