@@ -3,7 +3,7 @@ cytoscape-k-means
 
 ![Screenshot of clusters returned from K-Means algorithm](./demo-img.png?raw=true "Screenshot of clusters returned from K-Means algorithm")
 
-A basic k-means algorithm for Cytoscape.js.
+k-means and k-medoids algorithms for Cytoscape.js.
 
 *Zoe Xi, for Google Summer of Code.*
 
@@ -61,6 +61,23 @@ cy.elements().kMeans({
       },
       // And so on...
   ]
+});
+
+cy.elements().kMedoids({
+
+    // Note: The same options apply for the k-medoids algorithm.
+
+    // One of the major differences between the k-means and k-medoids algorithms
+    // is the manner in which the cluster centers are initialized. In k-means,
+    // the cluster centers (centroids) are vectors with elements initialized to
+    // random values within each dimension's range. In k-medoids, the cluster
+    // centers (medoids) are random nodes from the data set.
+
+    // The other is that the k-means algorithm determines new cluster centers
+    // by taking the average of all the nodes within that cluster, whereas
+    // k-medoids selects the node with the lowest configuration cost as the new
+    // cluster center.
+
 });
 ```
 
