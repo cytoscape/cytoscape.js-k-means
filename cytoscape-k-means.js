@@ -22,24 +22,27 @@
   };
 
   var distances = {
-    euclidean: function ( node, centroid, attributes ) {
+    euclidean: function ( node, centroid, attributes, type ) {
       var total = 0;
       for ( var dim = 0; dim < attributes.length; dim++ ) {
-        total += Math.pow( attributes[dim](node) - centroid[dim], 2 );
+        total += (type === 'vector') ? Math.pow( attributes[dim](node) - centroid[dim], 2 ) :
+             /* type === 'nodeObj' */  Math.pow( attributes[dim](node) - attributes[dim](centroid), 2 );
       }
       return Math.sqrt(total);
     },
-    manhattan: function ( node, centroid, attributes ) {
+    manhattan: function ( node, centroid, attributes, type ) {
       var total = 0;
       for ( var dim = 0; dim < attributes.length; dim++ ) {
-        total += Math.abs( attributes[dim](node) - centroid[dim] );
+        total += (type === 'vector') ? Math.abs( attributes[dim](node) - centroid[dim] ) :
+             /* type === 'nodeObj' */  Math.abs( attributes[dim](node) - attributes[dim](centroid) );
       }
       return total;
     },
-    max: function ( node, centroid, attributes ) {
+    max: function ( node, centroid, attributes, type ) {
       var max = 0;
       for ( var dim = 0; dim < attributes.length; dim++ ) {
-        max = Math.max( max, Math.abs( attributes[dim](node) - centroid[dim] ) );
+        max = (type === 'vector') ? Math.max( max, Math.abs( attributes[dim](node) - centroid[dim] ) ) :
+          /* type === 'nodeObj' */  Math.max( max, Math.abs( attributes[dim](node) - attributes[dim](centroid) ) );
       }
       return max;
     }
@@ -70,14 +73,14 @@
     return centroids;
   };
 
-  var classify = function( node, centroids, distance, attributes ) {
+  var classify = function( node, centroids, distance, attributes, type ) {
     var min   = Infinity;
     var index = 0;
 
     distance = distances[distance];
 
     for ( var i = 0; i < centroids.length; i++ ) {
-      var dist = distance(node, centroids[i], attributes);
+      var dist = distance( node, centroids[i], attributes, type );
       if (dist < min) {
         min = dist;
         index = i;
@@ -87,10 +90,67 @@
     return index;
   };
 
+  var buildCluster = function( centroid, nodes, assignment ) {
+    var cluster = [];
+    var node = null;
+
+    for ( var n = 0; n < nodes.length; n++ ) {
+      node = nodes[n];
+      if ( assignment[ node.id() ] === centroid ) {
+        //console.log("Node " + node.id() + " is associated with medoid #: " + m);
+        cluster.push( node );
+      }
+    }
+    return cluster;
+  };
+
   var hasConverged = function( v1, v2, roundFactor ) {
     v1 = Math.round( v1 * Math.pow(10, roundFactor) ) / Math.pow(10, roundFactor); // truncate to 'roundFactor' decimal places
     v2 = Math.round( v2 * Math.pow(10, roundFactor) ) / Math.pow(10, roundFactor);
     return v1 === v2;
+  };
+
+  var seenBefore = function ( node, medoids, n ) {
+    for ( var i = 0; i < n; i++ ) {
+      if ( node === medoids[i] )
+        return true;
+    }
+    return false;
+  };
+
+  var randomMedoids = function( nodes, k ) {
+    var medoids = new Array(k);
+
+    // For small data sets, the probability of medoid conflict is greater,
+    // so we need to check to see if we've already seen or chose this node before.
+    if (nodes.length < 50) {
+
+      // Randomly select k medoids from the n nodes
+      for (var i = 0; i < k; i++) {
+        var node = nodes[ Math.floor( Math.random() * nodes.length ) ];
+
+        // If we've already chosen this node to be a medoid, don't choose it again (for small data sets).
+        // Instead choose a different random node.
+        while ( seenBefore( node, medoids, i ) ) {
+          node = nodes[ Math.floor( Math.random() * nodes.length ) ];
+        }
+        medoids[i] = node;
+      }
+    }
+    else { // Relatively large data set, so pretty safe to not check and just select random nodes
+      for (var i = 0; i < k; i++) {
+        medoids[i] = nodes[ Math.floor( Math.random() * nodes.length ) ];
+      }
+    }
+    return medoids;
+  };
+
+  var findCost = function( potentialNewMedoid, cluster, attributes ) {
+    var cost = 0;
+    for ( var n = 0; n < cluster.length; n++ ) {
+      cost += distances['manhattan']( cluster[n], potentialNewMedoid, attributes, 'nodeObj' );
+    }
+    return cost;
   };
 
   var kMeans = function( options ){
@@ -117,22 +177,15 @@
       for ( var n = 0; n < nodes.length; n++ ) {
         node = nodes[n];
         // Determine which cluster this node belongs to: node id => cluster #
-        assignment[ node.id() ] = classify( node, centroids, opts.distance, opts.attributes );
+        assignment[ node.id() ] = classify( node, centroids, opts.distance, opts.attributes, 'vector' );
       }
 
       // Step 3: For each of the k clusters, update its centroid
       isStillMoving = false;
       for ( var c = 0; c < opts.k; c++ ) {
-        var cluster = [];
 
         // Get all nodes that belong to this cluster
-        for ( n = 0; n < nodes.length; n++ ) {
-          node = nodes[n];
-          if ( assignment[ node.id() ] === c ) {
-            //console.log("Node " + node.id() + " belongs in cluster " + c);
-            cluster.push( node );
-          }
-        }
+        var cluster = buildCluster( c, nodes, assignment );
 
         if ( cluster.length === 0 ) { // If cluster is empty, break out early & move to next cluster
           continue;
@@ -168,13 +221,79 @@
     return clusters;
   };
 
+  var kMedoids = function( options ) {
+    var cy    = this.cy();
+    var nodes = this.nodes();
+    var node  = null;
+    var opts  = {};
+
+    // Set parameters of algorithm: # of clusters, distance metric, etc.
+    setOptions( opts, options );
+
+    // Begin k-medoids algorithm
+    var clusters   = new Array(opts.k);
+    var assignment = {};
+    var curCost;
+    var minCosts = new Array(opts.k);    // minimum cost configuration for each cluster
+
+    // Step 1: Initialize k medoids
+    var medoids = randomMedoids( nodes, opts.k );
+
+    var isStillMoving = true;
+    var iterations = 0;
+
+    while ( isStillMoving && iterations < opts.maxIterations ) {
+
+      // Step 2: Assign nodes to the nearest medoid
+      for ( var n = 0; n < nodes.length; n++ ) {
+        node = nodes[n];
+        // Determine which cluster this node belongs to: node id => cluster #
+        assignment[ node.id() ] = classify( node, medoids, opts.distance, opts.attributes, 'nodeObj' );
+      }
+
+      isStillMoving = false;
+      // Step 3: For each medoid m, and for each node assciated with mediod m,
+      // select the node with the lowest configuration cost as new medoid.
+      for ( var m = 0; m < medoids.length; m++ ) {
+
+        // Get all nodes that belong to this medoid
+        var cluster = buildCluster( m, nodes, assignment );
+
+        if ( cluster.length === 0 ) { // If cluster is empty, break out early & move to next cluster
+          continue;
+        }
+
+        minCosts[m] = findCost( medoids[m], cluster, opts.attributes ); // original cost
+
+        // Select different medoid if its configuration has the lowest cost
+        for ( n = 0; n < cluster.length; n++ ) {
+          curCost = findCost( cluster[n], cluster, opts.attributes );
+          if ( curCost < minCosts[m] ) {
+            minCosts[m] = curCost;
+            medoids[m]  = cluster[n];
+            isStillMoving = true;
+          }
+        }
+
+        clusters[m] = cy.collection( cluster );
+      }
+
+      iterations++;
+    }
+
+    return clusters;
+  };
+
   // registers the extension on a cytoscape lib ref
   var register = function( cytoscape ){
 
     if( !cytoscape ){ return; } // can't register if cytoscape unspecified
 
-    // main entry point
+    // main entry point for k-means algorithm
     cytoscape( 'collection', 'kMeans', kMeans );
+
+    // main entry point for k-medoids algorithm
+    cytoscape( 'collection', 'kMedoids', kMedoids );
 
   };
 
