@@ -89,7 +89,7 @@ var clusters = cy.elements().kMedoids({
 
 #### Distance metric
 The metric used to measure the distance between two nodes. By default it is set to ```'euclidean'``` distance. It can be one of the pre-defined functions: ```'euclidean', 'manhattan', 'max'```,
-or you may create your own function within the [distances object](cytoscape-k-means.js) that returns a float representing the distance between two nodes.
+or you may pass in your own function (see the [distances object](cytoscape-k-means.js) for examples) that returns a float representing the distance between a node and cluster center.
 
 ## Publishing instructions
 

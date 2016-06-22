@@ -77,7 +77,7 @@
     var min   = Infinity;
     var index = 0;
 
-    distance = distances[distance];
+    distance = (typeof distance === 'string') ? distances[distance] : distance;
 
     for ( var i = 0; i < centroids.length; i++ ) {
       var dist = distance( node, centroids[i], attributes, type );
