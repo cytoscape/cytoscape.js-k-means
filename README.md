@@ -64,26 +64,26 @@ var options = {
     ]
 };
 
-var clusters = cy.elements().kMeans( options );
+var clusters = cy.elements().kMeans( options ); // Run the k-means algorithm.
 
-// Do something cool with the nodes found in the first cluster.
-clusters[0].myFunc();
+clusters[0].myFunc(); // Do something cool with the nodes found in the first cluster.
 
-var clusters = cy.elements().kMedoids({
+var clusters = cy.elements().kMedoids({ // Run the k-medoids algorithm.
 
-    // Note: The same options apply for the k-medoids algorithm.
-
-    // One of the major differences between the k-means and k-medoids algorithms
-    // is the manner in which the cluster centers are initialized. In k-means,
-    // the cluster centers (centroids) are vectors with elements initialized to
-    // random values within each dimension's range. In k-medoids, the cluster
-    // centers (medoids) are random nodes from the data set.
-
-    // The other is that the k-means algorithm determines new cluster centers
-    // by taking the average of all the nodes within that cluster, whereas
-    // k-medoids selects the node with the lowest configuration cost as the new
-    // cluster center.
-
+    /**
+     * Note: The same options apply for the k-medoids algorithm.
+     *
+     * One of the major differences between the k-means and k-medoids algorithms
+     * is the manner in which the cluster centers are initialized. In k-means,
+     * the cluster centers (centroids) are vectors with elements initialized to
+     * random values within each dimension's range. In k-medoids, the cluster
+     * centers (medoids) are random nodes from the data set.
+     *
+     * The other is that the k-means algorithm determines new cluster centers
+     * by taking the average of all the nodes within that cluster, whereas
+     * k-medoids selects the node with the lowest configuration cost as the new
+     * cluster center.
+     */
 });
 ```
 
