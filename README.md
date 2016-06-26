@@ -12,7 +12,7 @@ k-means and k-medoids algorithms for Cytoscape.js.
 
 ## Dependencies
 
- * Cytoscape.js >=2.6.12
+ * Cytoscape.js >= 2.6.12
 
 
 ## Usage instructions
@@ -43,13 +43,13 @@ Plain HTML/JS has the extension registered for you automatically, because no `re
 
 
 ## API
-The k-means and k-medoids algorithms return an array of clusters generated from the nodes of the calling graph instance. Each cluster contains references to the nodes that belong to that cluster.
+The k-means and k-medoids algorithms return an array of clusters generated from the data set (nodes of the calling graph instance). Each cluster contains references to the nodes that belong to that cluster.
 
 ```js
 var options = {
     k: '3',                               // number of clusters to return
     distance: 'euclidean',                // distance classifier
-    maxIterations: 12,                    // maximum number of interations of the k-means algorithm in a single run
+    maxIterations: 12,                    // maximum number of iterations of the k-means algorithm in a single run
     attributes: [                         // attributes/features used to group nodes
         function(node) {
             return node.data('attrA');
