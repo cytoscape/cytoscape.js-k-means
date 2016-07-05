@@ -297,9 +297,33 @@
     // Begin k-means algorithm
     var clusters = new Array(opts.k);
 
+    // Step 1: Initialize partition matrix U(0) and centroids.
+    var U = new Array(opts.k);
+    for ( var i = 0; i < opts.k; i++ ) {
+      U[i] = new Array(nodes.length);
+    }
+
+    var isStillMoving = true;
+    var iterations = 0;
+
+    while ( isStillMoving && iterations < opts.maxIterations ) {
+      
+      // Step 2: Update the k centroids.
+
+      // Step 3: Update the partition matrix U.
 
 
-    return clusters;
+      // Step 4: Check for convergence.
+      
+    }
+    
+    // Assign nodes to clusters with highest probability.
+    
+
+    return {
+      clusters: clusters,
+      degreeOfMembership: U
+    };
   };
 
   // registers the extension on a cytoscape lib ref

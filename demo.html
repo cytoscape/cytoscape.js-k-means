@@ -74,12 +74,12 @@
                 maxIterations: 12
             };
 
-            // Run k-means on graph nodes
-            var clusters = cy.elements().fuzzyCMeans( options );
+            // Run clustering algorithm on graph nodes
+            var res = cy.elements().fuzzyCMeans( options );
 
             // Assign random colors to each cluster!
-            for (var c = 0; c < clusters.length; c++) {
-                clusters[c].style( 'background-color', '#' + Math.floor(Math.random()*16777215).toString(16) );
+            for (var c = 0; c < res.clusters.length; c++) {
+                res.clusters[c].style( 'background-color', '#' + Math.floor(Math.random()*16777215).toString(16) );
             }
 
         });
