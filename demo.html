@@ -67,7 +67,7 @@
                 }
             });
 
-            // Input parameters to k-means algorithm
+            // Input parameters to clustering algorithm
             var options = {
                 k: 4,
                 distance: "euclidean",
@@ -75,7 +75,7 @@
             };
 
             // Run k-means on graph nodes
-            var clusters = cy.elements().kMedoids( options );
+            var clusters = cy.elements().fuzzyCMeans( options );
 
             // Assign random colors to each cluster!
             for (var c = 0; c < clusters.length; c++) {

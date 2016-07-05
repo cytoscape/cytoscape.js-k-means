@@ -4,6 +4,7 @@
 
   var defaults = {
     k: 2,
+    m: 2,
     distance: 'euclidean',
     maxIterations: 10,
     attributes: [
@@ -25,24 +26,24 @@
     euclidean: function ( node, centroid, attributes, mode ) {
       var total = 0;
       for ( var dim = 0; dim < attributes.length; dim++ ) {
-        total += (mode === 'kMeans') ? Math.pow( attributes[dim](node) - centroid[dim], 2 ) :
-             /* mode === 'kMedoids' */ Math.pow( attributes[dim](node) - attributes[dim](centroid), 2 );
+        total += (mode === 'kMedoids') ? Math.pow( attributes[dim](node) - attributes[dim](centroid), 2 ) :
+               /* mode === 'kMeans' */   Math.pow( attributes[dim](node) - centroid[dim], 2 );
       }
       return Math.sqrt(total);
     },
     manhattan: function ( node, centroid, attributes, mode ) {
       var total = 0;
       for ( var dim = 0; dim < attributes.length; dim++ ) {
-        total += (mode === 'kMeans') ? Math.abs( attributes[dim](node) - centroid[dim] ) :
-             /* mode === 'kMedoids' */ Math.abs( attributes[dim](node) - attributes[dim](centroid) );
+        total += (mode === 'kMedoids') ? Math.pow( attributes[dim](node) - attributes[dim](centroid), 2 ) :
+               /* mode === 'kMeans' */   Math.pow( attributes[dim](node) - centroid[dim], 2 );
       }
       return total;
     },
     max: function ( node, centroid, attributes, mode ) {
       var max = 0;
       for ( var dim = 0; dim < attributes.length; dim++ ) {
-        max = (mode === 'kMeans') ? Math.max( max, Math.abs( attributes[dim](node) - centroid[dim] ) ) :
-          /* mode === 'kMedoids' */ Math.max( max, Math.abs( attributes[dim](node) - attributes[dim](centroid) ) );
+        max = (mode === 'kMedoids') ? Math.pow( attributes[dim](node) - attributes[dim](centroid), 2 ) :
+            /* mode === 'kMeans' */   Math.pow( attributes[dim](node) - centroid[dim], 2 );
       }
       return max;
     }
@@ -284,6 +285,23 @@
     return clusters;
   };
 
+  var fuzzyCMeans = function( options ) {
+    var cy    = this.cy();
+    var nodes = this.nodes();
+    var node  = null;
+    var opts  = {};
+
+    // Set parameters of algorithm: # of clusters, fuzziness coefficient, etc.
+    setOptions( opts, options );
+
+    // Begin k-means algorithm
+    var clusters = new Array(opts.k);
+
+
+
+    return clusters;
+  };
+
   // registers the extension on a cytoscape lib ref
   var register = function( cytoscape ){
 
@@ -294,6 +312,9 @@
 
     // main entry point for k-medoids algorithm
     cytoscape( 'collection', 'kMedoids', kMedoids );
+
+    // main entry point for fuzzy c-means algorithm
+    cytoscape( 'collection', 'fuzzyCMeans', fuzzyCMeans );
 
   };
 
