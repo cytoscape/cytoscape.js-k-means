@@ -285,6 +285,51 @@
     return clusters;
   };
 
+  var initFCM = function( U, centroids, weight, nodes, opts ) {
+    U = new Array(nodes.length);
+    for ( var i = 0; i < nodes.length; i++ ) { // N x C matrix
+      U[i] = new Array(opts.k);
+    }
+
+    // TODO: diff ways to initialize U(0): binary or fractional
+
+    centroids = new Array(opts.k);
+    for ( var i = 0; i < opts.k; i++ ) {
+      centroids[i] = new Array(opts.attributes.length);
+    }
+
+    weight = new Array(nodes.length);
+    for ( var i = 0; i < nodes.length; i++ ) { // N x C matrix
+      weight[i] = new Array(opts.k);
+    }
+  };
+
+  var updateCentroids = function( centroids, nodes, U, weight, opts ) {
+    var numerator, denominator;
+
+    for ( var n = 0; n < nodes.length; n++ ) {
+      for ( var c = 0; c < centroids.length; c++ ) {
+        weight[n][c] = Math.pow( U[n][c], opts.m );
+      }
+    }
+
+    for ( var c = 0; c < centroids.length; c++ ) {
+      for ( var dim = 0; dim < opts.attributes.length; dim++ ) {
+        numerator   = 0;
+        denominator = 0;
+        for ( var n = 0; n < nodes.length; n++ ) {
+          numerator   += weight[n][c] * attributes[dim](nodes[n]);
+          denominator += weight[n][c];
+        }
+        centroids[c][dim] = numerator / denominator;
+      }
+    }
+  };
+
+  var updateMembership = function() {
+
+  };
+
   var fuzzyCMeans = function( options ) {
     var cy    = this.cy();
     var nodes = this.nodes();
@@ -294,27 +339,29 @@
     // Set parameters of algorithm: # of clusters, fuzziness coefficient, etc.
     setOptions( opts, options );
 
-    // Begin k-means algorithm
-    var clusters = new Array(opts.k);
+    // Begin fuzzy c-means algorithm
+    var clusters  = new Array(opts.k);
+    var centroids;
+    var U;
+    var weight;
 
-    // Step 1: Initialize partition matrix U(0) and centroids.
-    var U = new Array(opts.k);
-    for ( var i = 0; i < opts.k; i++ ) {
-      U[i] = new Array(nodes.length);
-    }
+    // Step 1: Prepare variables.
+    initFCM( U, centroids, weight, nodes, opts );
 
     var isStillMoving = true;
     var iterations = 0;
 
     while ( isStillMoving && iterations < opts.maxIterations ) {
       
-      // Step 2: Update the k centroids.
+      // Step 2: Calculate the centroids for each step.
+      updateCentroids( centroids, nodes, U, weight, opts );
 
       // Step 3: Update the partition matrix U.
-
+      updateMembership( U, opts );
 
       // Step 4: Check for convergence.
-      
+      isStillMoving = false;
+
     }
     
     // Assign nodes to clusters with highest probability.
