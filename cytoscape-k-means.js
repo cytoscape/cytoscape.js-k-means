@@ -302,17 +302,26 @@
 
   var initFCM = function( U, _U, centroids, weight, nodes, opts ) {
 
-    U = new Array(nodes.length);
-    for ( var i = 0; i < nodes.length; i++ ) { // N x C matrix
-      U[i] = new Array(opts.k);
-    }
-
     _U = new Array(nodes.length);
     for ( var i = 0; i < nodes.length; i++ ) { // N x C matrix
       _U[i] = new Array(opts.k);
     }
 
+    U = new Array(nodes.length);
+    for ( var i = 0; i < nodes.length; i++ ) { // N x C matrix
+      U[i] = new Array(opts.k);
+    }
     // TODO: diff ways to initialize U(0): binary or fractional
+    for (var i = 0; i < nodes.length; i++) {
+      var total = 0;
+      for (var j = 0; j < opts.k; j++) {
+        U[i][j] = Math.random();
+        total += U[i][j];
+      }
+      for (var j = 0; j < opts.k; j++) {
+        U[i][j] = U[i][j] / total;
+      }
+    }
 
     centroids = new Array(opts.k);
     for ( var i = 0; i < opts.k; i++ ) {
@@ -370,6 +379,31 @@
     }
   };
 
+  var assign = function( nodes, U, opts, cy ) {
+    var clusters = new Array(opts.k);
+    for ( var c = 0; c < clusters.length; c++ ) {
+      clusters[c] = [];
+    }
+
+    var max;
+    var index = 0;
+    for ( var n = 0; n < U.length; n++ ) { // for each node (U is N x C matrix)
+      max = -Infinity;
+      // Determine which cluster the node is most likely to belong in
+      for ( var c = 0; c < U[0].length; c++ ) {
+        if ( U[n][c] > max ) {
+          index = c;
+        }
+      }
+      clusters[index].push( nodes[n] );
+    }
+
+    // Turn every array into a collection of nodes
+    for ( var c = 0; c < clusters.length; c++ ) {
+      clusters[c] = cy.collection( clusters[c] );
+    }
+  };
+
   var fuzzyCMeans = function( options ) {
     var cy    = this.cy();
     var nodes = this.nodes();
@@ -380,7 +414,7 @@
     setOptions( opts, options );
 
     // Begin fuzzy c-means algorithm
-    var clusters  = new Array(opts.k);
+    var clusters;
     var centroids;
     var U;
     var _U;
@@ -407,7 +441,7 @@
     }
     
     // Assign nodes to clusters with highest probability.
-    
+    clusters = assign( nodes, U, opts, cy );
 
     return {
       clusters: clusters,
