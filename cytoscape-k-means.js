@@ -1,6 +1,9 @@
 ;(function(){ 'use strict';
 
-  // Implemented from the reference library: https://harthur.github.io/clusterfck/
+  // References for k-means: https://harthur.github.io/clusterfck/
+  // References for k-medoids: http://www.math.le.ac.uk/people/ag153/homepage/KmeansKmedoids/Kmeans_Kmedoids.html
+  // References for fuzzy c-means: Ross, Fuzzy Logic w/Engineering Applications (2010), pages 352-353 
+  //                               http://yaikhom.com/2013/03/16/implementing-the-fuzzy-c-means-algorithm.html
 
   var defaults = {
     k: 2,
