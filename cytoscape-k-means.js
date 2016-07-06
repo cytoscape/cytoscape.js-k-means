@@ -300,10 +300,16 @@
     return clusters;
   };
 
-  var initFCM = function( U, centroids, weight, nodes, opts ) {
+  var initFCM = function( U, _U, centroids, weight, nodes, opts ) {
+
     U = new Array(nodes.length);
     for ( var i = 0; i < nodes.length; i++ ) { // N x C matrix
       U[i] = new Array(opts.k);
+    }
+
+    _U = new Array(nodes.length);
+    for ( var i = 0; i < nodes.length; i++ ) { // N x C matrix
+      _U[i] = new Array(opts.k);
     }
 
     // TODO: diff ways to initialize U(0): binary or fractional
@@ -341,8 +347,27 @@
     }
   };
 
-  var updateMembership = function( U, _U, opts ) {
+  var updateMembership = function( U, _U, centroids, nodes, opts ) {
+    // Save previous step
+    for (var i = 0; i < U.length; i++) {
+      _U[i] = U[i].slice();
+    }
 
+    var sum, numerator, denominator;
+    var pow = 2 / (opts.m - 1);
+
+    for ( var c = 0; c < centroids.length; c++ ) {
+      for ( var n = 0; n < nodes.length; n++ ) {
+
+        sum = 0;
+        for ( var k = 0; k < centroids.length; k++ ) { // against all other centroids
+          numerator   = distances[opts.distance]( nodes[n], centroids[c], opts.attributes, 'cmeans' );
+          denominator = distances[opts.distance]( nodes[n], centroids[k], opts.attributes, 'cmeans' );
+          sum += Math.pow( numerator / denominator, pow );
+        }
+        U[n][c] = 1 / sum;
+      }
+    }
   };
 
   var fuzzyCMeans = function( options ) {
