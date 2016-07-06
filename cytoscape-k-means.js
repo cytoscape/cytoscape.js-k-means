@@ -106,9 +106,24 @@
   };
 
   var hasConverged = function( v1, v2, roundFactor ) {
-    v1 = Math.round( v1 * Math.pow(10, roundFactor) ) / Math.pow(10, roundFactor); // truncate to 'roundFactor' decimal places
-    v2 = Math.round( v2 * Math.pow(10, roundFactor) ) / Math.pow(10, roundFactor);
-    return v1 === v2;
+    if ( typeof v1 === 'object' || typeof v2 === 'object' ) { // type matrices
+      for ( var i = 0; i < v1.length; i++ ) {
+        for (var j = 0; j < v1[i].length; j++ ) {
+          var v1_elem = Math.round(v1[i][j] * Math.pow(10, roundFactor)) / Math.pow(10, roundFactor); // truncate to 'roundFactor' decimal places
+          var v2_elem = Math.round(v2[i][j] * Math.pow(10, roundFactor)) / Math.pow(10, roundFactor);
+
+          if (v1_elem !== v2_elem) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+    else {
+      v1 = Math.round(v1 * Math.pow(10, roundFactor)) / Math.pow(10, roundFactor); // truncate to 'roundFactor' decimal places
+      v2 = Math.round(v2 * Math.pow(10, roundFactor)) / Math.pow(10, roundFactor);
+      return v1 === v2;
+    }
   };
 
   var seenBefore = function ( node, medoids, n ) {
@@ -326,7 +341,7 @@
     }
   };
 
-  var updateMembership = function() {
+  var updateMembership = function( U, _U, opts ) {
 
   };
 
@@ -343,6 +358,7 @@
     var clusters  = new Array(opts.k);
     var centroids;
     var U;
+    var _U;
     var weight;
 
     // Step 1: Prepare variables.
@@ -352,15 +368,16 @@
     var iterations = 0;
 
     while ( isStillMoving && iterations < opts.maxIterations ) {
+      isStillMoving = false;
       
       // Step 2: Calculate the centroids for each step.
       updateCentroids( centroids, nodes, U, weight, opts );
 
       // Step 3: Update the partition matrix U.
-      updateMembership( U, opts );
+      updateMembership( U, _U, opts );
 
       // Step 4: Check for convergence.
-      isStillMoving = false;
+      isStillMoving = hasConverged( U, _U, 4 );
 
     }
     
