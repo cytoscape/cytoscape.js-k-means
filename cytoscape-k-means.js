@@ -22,6 +22,18 @@
     for (var i in options)  { opts[i] = options[i];  }
   };
 
+  var printMatrix = function( M ) { // used for debugging purposes only
+
+    for ( var i = 0; i < M.length; i++ ) {
+      var row = '';
+      for ( var j = 0; j < M[0].length; j++ ) {
+        row += Number(M[i][j]).toFixed(3) + ' ';
+      }
+      console.log(row);
+    }
+    console.log('');
+  };
+
   var distances = {
     euclidean: function ( node, centroid, attributes, mode ) {
       var total = 0;
@@ -311,7 +323,7 @@
     for ( var i = 0; i < nodes.length; i++ ) { // N x C matrix
       U[i] = new Array(opts.k);
     }
-    // TODO: diff ways to initialize U(0): binary or fractional
+
     for (var i = 0; i < nodes.length; i++) {
       var total = 0;
       for (var j = 0; j < opts.k; j++) {
@@ -348,7 +360,7 @@
         numerator   = 0;
         denominator = 0;
         for ( var n = 0; n < nodes.length; n++ ) {
-          numerator   += weight[n][c] * attributes[dim](nodes[n]);
+          numerator   += weight[n][c] * opts.attributes[dim](nodes[n]);
           denominator += weight[n][c];
         }
         centroids[c][dim] = numerator / denominator;
@@ -386,12 +398,14 @@
     }
 
     var max;
-    var index = 0;
+    var index;
     for ( var n = 0; n < U.length; n++ ) { // for each node (U is N x C matrix)
-      max = -Infinity;
+      max   = -Infinity;
+      index = -1;
       // Determine which cluster the node is most likely to belong in
       for ( var c = 0; c < U[0].length; c++ ) {
         if ( U[n][c] > max ) {
+          max = U[n][c];
           index = c;
         }
       }
@@ -402,6 +416,7 @@
     for ( var c = 0; c < clusters.length; c++ ) {
       clusters[c] = cy.collection( clusters[c] );
     }
+    return clusters;
   };
 
   var fuzzyCMeans = function( options ) {
@@ -421,23 +436,57 @@
     var weight;
 
     // Step 1: Prepare variables.
-    initFCM( U, centroids, weight, nodes, opts );
+    //initFCM( U, _U, centroids, weight, nodes, opts );
+    _U = new Array(nodes.length);
+    for ( var i = 0; i < nodes.length; i++ ) { // N x C matrix
+      _U[i] = new Array(opts.k);
+    }
+
+    U = new Array(nodes.length);
+    for ( var i = 0; i < nodes.length; i++ ) { // N x C matrix
+      U[i] = new Array(opts.k);
+    }
+
+    for (var i = 0; i < nodes.length; i++) {
+      var total = 0;
+      for (var j = 0; j < opts.k; j++) {
+        U[i][j] = Math.random();
+        total += U[i][j];
+      }
+      for (var j = 0; j < opts.k; j++) {
+        U[i][j] = U[i][j] / total;
+      }
+    }
+
+    centroids = new Array(opts.k);
+    for ( var i = 0; i < opts.k; i++ ) {
+      centroids[i] = new Array(opts.attributes.length);
+    }
+
+    weight = new Array(nodes.length);
+    for ( var i = 0; i < nodes.length; i++ ) { // N x C matrix
+      weight[i] = new Array(opts.k);
+    }
+
 
     var isStillMoving = true;
     var iterations = 0;
 
     while ( isStillMoving && iterations < opts.maxIterations ) {
       isStillMoving = false;
-      
+
       // Step 2: Calculate the centroids for each step.
       updateCentroids( centroids, nodes, U, weight, opts );
 
       // Step 3: Update the partition matrix U.
-      updateMembership( U, _U, opts );
+      updateMembership( U, _U, centroids, nodes, opts );
 
       // Step 4: Check for convergence.
-      isStillMoving = hasConverged( U, _U, 4 );
+      if ( !hasConverged( U, _U, 4 ) ) {
+        isStillMoving = true;
+      }
 
+      iterations++;
     }
     
     // Assign nodes to clusters with highest probability.
