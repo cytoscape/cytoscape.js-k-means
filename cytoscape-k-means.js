@@ -439,38 +439,7 @@
     var weight;
 
     // Step 1: Prepare variables.
-    //initFCM( U, _U, centroids, weight, nodes, opts );
-    _U = new Array(nodes.length);
-    for ( var i = 0; i < nodes.length; i++ ) { // N x C matrix
-      _U[i] = new Array(opts.k);
-    }
-
-    U = new Array(nodes.length);
-    for ( var i = 0; i < nodes.length; i++ ) { // N x C matrix
-      U[i] = new Array(opts.k);
-    }
-
-    for (var i = 0; i < nodes.length; i++) {
-      var total = 0;
-      for (var j = 0; j < opts.k; j++) {
-        U[i][j] = Math.random();
-        total += U[i][j];
-      }
-      for (var j = 0; j < opts.k; j++) {
-        U[i][j] = U[i][j] / total;
-      }
-    }
-
-    centroids = new Array(opts.k);
-    for ( var i = 0; i < opts.k; i++ ) {
-      centroids[i] = new Array(opts.attributes.length);
-    }
-
-    weight = new Array(nodes.length);
-    for ( var i = 0; i < nodes.length; i++ ) { // N x C matrix
-      weight[i] = new Array(opts.k);
-    }
-
+    initFCM( U, _U, centroids, weight, nodes, opts );
 
     var isStillMoving = true;
     var iterations = 0;
