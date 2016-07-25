@@ -10,7 +10,7 @@
     <script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>
 
     <!-- for testing with local version of cytoscape.js -->
-    <!-- <script src="../cytoscape.js/build/cytoscape.js"></script> -->
+    <!--<script src="../cytoscape.js/build/cytoscape.js"></script>-->
 
     <script src="cytoscape-k-means.js"></script>
 
@@ -75,11 +75,11 @@
             };
 
             // Run clustering algorithm on graph nodes
-            var res = cy.elements().fuzzyCMeans( options );
+            var clusters = cy.elements().kMeans( options );
 
             // Assign random colors to each cluster!
-            for (var c = 0; c < res.clusters.length; c++) {
-                res.clusters[c].style( 'background-color', '#' + Math.floor(Math.random()*16777215).toString(16) );
+            for (var c = 0; c < clusters.length; c++) {
+                clusters[c].style( 'background-color', '#' + Math.floor(Math.random()*16777215).toString(16) );
             }
 
         });

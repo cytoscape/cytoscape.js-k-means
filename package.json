@@ -23,12 +23,14 @@
   },
   "homepage": "https://github.com/cytoscape/cytoscape.js-k-means",
   "devDependencies": {
+    "chai": "^3.5.0",
     "gulp": "^3.8.8",
     "gulp-jshint": "^1.8.5",
     "gulp-prompt": "^0.1.1",
     "gulp-replace": "^0.4.0",
     "gulp-shell": "^0.2.9",
     "jshint-stylish": "^1.0.0",
+    "mocha": "^2.5.3",
     "run-sequence": "^1.0.0"
   }
 }

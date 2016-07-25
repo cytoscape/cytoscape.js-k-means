@@ -17,7 +17,9 @@
       function(node) {
         return node.position('y');
       }
-    ]
+    ],
+    testMode: false,
+    testCentroids: null
   };
 
   var setOptions = function( opts, options ) {
@@ -196,9 +198,26 @@
     // Begin k-means algorithm
     var clusters   = new Array(opts.k);
     var assignment = {};
+    var centroids;
 
     // Step 1: Initialize centroid positions
-    var centroids = randomCentroids( nodes, opts.k, opts.attributes );
+    if ( opts.testMode ) {
+      if( typeof opts.testCentroids === 'number') {
+        // TODO: implement a seeded random number generator.
+        var seed  = opts.testCentroids;
+        centroids = randomCentroids( nodes, opts.k, opts.attributes, seed );
+      }
+      else if ( typeof opts.testCentroids === 'object') {
+        centroids = opts.testCentroids;
+      }
+      else {
+        centroids = randomCentroids( nodes, opts.k, opts.attributes );
+      }
+    }
+    else {
+      centroids = randomCentroids( nodes, opts.k, opts.attributes );
+    }
+
     var isStillMoving = true;
     var iterations = 0;
 
