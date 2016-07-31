@@ -1,6 +1,9 @@
 
 var expect = chai.expect;
 
+// Expected results generated from the numerical example found in:
+// http://mnemstudio.org/clustering-k-means-example-1.htm
+
 describe('k-Means', function() {
 
   var cy;

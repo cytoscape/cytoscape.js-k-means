@@ -281,13 +281,27 @@
     setOptions( opts, options );
 
     // Begin k-medoids algorithm
-    var clusters   = new Array(opts.k);
+    var clusters = new Array(opts.k);
+    var medoids;
     var assignment = {};
     var curCost;
     var minCosts = new Array(opts.k);    // minimum cost configuration for each cluster
 
     // Step 1: Initialize k medoids
-    var medoids = randomMedoids( nodes, opts.k );
+    if ( opts.testMode ) {
+      if( typeof opts.testCentroids === 'number') {
+        // TODO: implement random generator so user can just input seed number
+      }
+      else if ( typeof opts.testCentroids === 'object') {
+        medoids = opts.testCentroids;
+      }
+      else {
+        medoids = randomMedoids(nodes, opts.k);
+      }
+    }
+    else {
+      medoids = randomMedoids(nodes, opts.k);
+    }
 
     var isStillMoving = true;
     var iterations = 0;
@@ -457,8 +471,39 @@
     var _U;
     var weight;
 
-    // Step 1: Prepare variables.
-    initFCM( U, _U, centroids, weight, nodes, opts );
+    // Step 1: Initialize variables.
+    //initFCM( U, _U, centroids, weight, nodes, opts );
+    _U = new Array(nodes.length);
+    for ( var i = 0; i < nodes.length; i++ ) { // N x C matrix
+      _U[i] = new Array(opts.k);
+    }
+
+    U = new Array(nodes.length);
+    for ( var i = 0; i < nodes.length; i++ ) { // N x C matrix
+      U[i] = new Array(opts.k);
+    }
+
+    for (var i = 0; i < nodes.length; i++) {
+      var total = 0;
+      for (var j = 0; j < opts.k; j++) {
+        U[i][j] = Math.random();
+        total += U[i][j];
+      }
+      for (var j = 0; j < opts.k; j++) {
+        U[i][j] = U[i][j] / total;
+      }
+    }
+
+    centroids = new Array(opts.k);
+    for ( var i = 0; i < opts.k; i++ ) {
+      centroids[i] = new Array(opts.attributes.length);
+    }
+
+    weight = new Array(nodes.length);
+    for ( var i = 0; i < nodes.length; i++ ) { // N x C matrix
+      weight[i] = new Array(opts.k);
+    }
+    // end init FCM
 
     var isStillMoving = true;
     var iterations = 0;
