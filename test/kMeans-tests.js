@@ -1,7 +1,7 @@
 
 var expect = chai.expect;
 
-// Expected results generated from the numerical example found in:
+// Expected results generated from the numerical example found at:
 // http://mnemstudio.org/clustering-k-means-example-1.htm
 
 describe('k-Means', function() {
